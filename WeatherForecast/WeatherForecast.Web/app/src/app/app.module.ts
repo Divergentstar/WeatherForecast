@@ -6,6 +6,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { SharedModule } from './shared/shared.module';
 import { AppRoutingModule } from './app-routing.module';
 import { WeatherForecastModule } from './weather-forecast/weather-forecast.module';
 
@@ -17,6 +18,7 @@ import { WeatherForecastModule } from './weather-forecast/weather-forecast.modul
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
+    SharedModule,
     WeatherForecastModule,
     EffectsModule.forRoot([]),
     StoreModule.forRoot({}),

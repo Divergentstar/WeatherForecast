@@ -6,12 +6,12 @@ using WeatherForecast.Domain.WeatherForecast.Entities;
 
 namespace WeatherForecast.Application.WeatherForecast.Consumers
 {
-    public class WeatherForecastConsumer : IConsumer<SendWeatherForecast>
+    public class SendWeatherForecastConsumer : IConsumer<SendWeatherForecast>
     {
         private readonly IWeatherForecastService _service;
         private readonly IHubContext<WeatherForecastHub> _hub;
 
-        public WeatherForecastConsumer(IWeatherForecastService service, IHubContext<WeatherForecastHub> hub)
+        public SendWeatherForecastConsumer(IWeatherForecastService service, IHubContext<WeatherForecastHub> hub)
         {
             _hub = hub;
             _service = service;

@@ -1,9 +1,10 @@
-using Autofac;
+﻿using Autofac;
 using MassTransit;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using WeatherForecast.Application;
+using WeatherForecast.Application.Common.Consumers;
 using WeatherForecast.Application.WeatherForecast.Consumers;
 using WeatherForecast.Common.Configuration;
 using WeatherForecast.Domain.Common.Entities;
@@ -44,11 +45,12 @@ namespace WeatherForecast.Web
             services.AddSignalR();
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<WeatherForecastConsumer>();
+                x.AddConsumer<SendProgressMessageConsumer>();
+                x.AddConsumer<SendWeatherForecastConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host("localhost", "/");
-                    //cfg.Host(new Uri(weatherForecastConfig.RabbitMQUri)); // this should work I think, no idea why it doesn't, don't really care
+                    //cfg.Host(new Uri(weatherForecastConfig.RabbitMQUri));
                     cfg.ConfigureEndpoints(context);
                 });
             });

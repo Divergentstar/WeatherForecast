@@ -30,9 +30,11 @@ export class WeatherForecastEffects {
       }),
       switchMap((result) => {
         if (result && result.success) {
-          const weatherForecast$ = this.signalRService.registerListener<ListResultModel<WeatherForecastModel>>(result.result);
+          this.signalRService.registerProgressListener();
+          const weatherForecast$ = this.signalRService.registerListener<ListResultModel<WeatherForecastModel>>(result.result)
+            .pipe(map((weatherForecast) => weatherForecast.data.map((m) => new WeatherForecastModel(m))));
 
-          return this.service.getWeatherForecast(weatherForecast$)
+          return weatherForecast$
             .pipe(map((weatherForecast) => {
               console.log('stop weather forecast');
               this.signalRService.stopConnection();

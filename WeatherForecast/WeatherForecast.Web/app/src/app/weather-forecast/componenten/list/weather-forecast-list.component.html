@@ -1,5 +1,7 @@
 <div *ngIf="!weatherForecast || weatherForecast.length == 0">
-  Forecast loading...
+  <div *ngIf="!progressMessage">Forecast starting...</div>
+  <div *ngIf="progressMessage && progressMessage?.messageType === messageTypeProgress">Forecast loading...: {{ progressMessage.message }}</div>
+  <div *ngIf="progressMessage && progressMessage.messageType !== messageTypeProgress">Forecast couldn't be loaded: {{ progressMessage.message }}</div>
 </div>
 <div *ngIf="weatherForecast && weatherForecast.length > 0">
   <div *ngFor="let forecast of weatherForecast">

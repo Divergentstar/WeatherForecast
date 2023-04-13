@@ -1,13 +1,13 @@
 import { WeatherForecastModel } from '../shared/models/weather-forecast-model';
 import { WeatherForecastAction, WeatherForecastActionTypes } from './weather-forecast.actions';
 
-export const WEATHER_FORECAST_FEATURE_KEY = 'ramingFeature';
+export const WEATHER_FORECAST_FEATURE_KEY = 'weatherForecastFeature';
 
 export interface WeatherForecastState {
   weatherForecast: WeatherForecastModel[];
 }
 
-export interface RamingPartialState {
+export interface WeatherForecastPartialState {
   readonly [WEATHER_FORECAST_FEATURE_KEY]: WeatherForecastState;
 }
 

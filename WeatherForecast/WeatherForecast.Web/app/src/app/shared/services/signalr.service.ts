@@ -2,12 +2,18 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { environment } from '../../../environments/environment';
+import { ApplicatieStoreService } from './applicatie-store.service';
+import { ProgressMessageModel } from '../models/progress-message-model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
   private hubConnection?: HubConnection;
+
+  constructor(
+    private applicatieStore: ApplicatieStoreService
+  ) { }
 
   public buildConnection(path: string): void {
     console.log('building connection');
@@ -31,6 +37,15 @@ export class SignalRService {
       },
       error => console.error(error)
     );
+  }
+
+
+  public registerProgressListener(): void {
+    const methodName = 'SendProgressMessage';
+    console.log(`registering listener on method ${methodName}`);
+    this.hubConnection?.on(methodName, (data: ProgressMessageModel) => {
+      this.applicatieStore.updateProgressMessage(data);
+    });
   }
 
   public registerListener<T>(methodName: string): Observable<T> {

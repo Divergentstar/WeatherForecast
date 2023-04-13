@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using WeatherForecast.Application.Common.Dto;
 using WeatherForecast.Application.WeatherForecast.Dto;
+using WeatherForecast.Domain.Common.Entities;
 using WeatherForecast.Domain.WeatherForecast.Entities;
 
 namespace WeatherForecast.Application.WeatherForecast.Services
@@ -8,6 +9,7 @@ namespace WeatherForecast.Application.WeatherForecast.Services
     public class WeatherForecastService : IWeatherForecastService
     {
         private readonly Random _random = new Random();
+        private const string _context = "WeatherForecast";
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly List<string> _summaries = new List<string>
         {
@@ -47,20 +49,39 @@ namespace WeatherForecast.Application.WeatherForecast.Services
             {
                 result.Success = false;
                 result.Errors.Add(exception.Message);
+                await _publishEndpoint.Publish(new SendProgressMessage
+                {
+                    Message = new ProgressMessage
+                    {
+                        Context = _context,
+                        Message = exception.Message,
+                        MessageType = MessageType.Error
+                    }
+                });
             }
 
             return result;
         }
 
-        public Task<ListResultDto<WeatherForecastDto>> GetWeatherForecastAsync()
+        public async Task<ListResultDto<WeatherForecastDto>> GetWeatherForecastAsync()
         {
-            var index = -1;
+            var days = 5;
+            var index = 0;
             var weatherForecast = new ListResultDto<WeatherForecastDto>
             {
                 Data = new List<WeatherForecastDto>()
             };
+            await _publishEndpoint.Publish(new SendProgressMessage
+            {
+                Message = new ProgressMessage
+                {
+                    Context = _context,
+                    Message = $"Completion process: 0% - received {index} of {days} days",
+                    MessageType = MessageType.Progress
+                }
+            });
 
-            while (index < 5)
+            while (index < days)
             {
                 index++;
                 weatherForecast.Data.Add(new WeatherForecastDto
@@ -69,10 +90,19 @@ namespace WeatherForecast.Application.WeatherForecast.Services
                     TemperatureC = _random.Next(-10, 45),
                     Summary = _summaries[_random.Next(_summaries.Count)]
                 });
+                await _publishEndpoint.Publish(new SendProgressMessage
+                {
+                    Message = new ProgressMessage
+                    {
+                        Context = _context,
+                        Message = $"Completion process: {index * (100/days)}% - received {index} of {days} days",
+                        MessageType = MessageType.Progress
+                    }
+                });
                 Thread.Sleep(TimeSpan.FromSeconds(10));
             }
 
-            return Task.FromResult(weatherForecast);
+            return weatherForecast;
         }
     }
 }

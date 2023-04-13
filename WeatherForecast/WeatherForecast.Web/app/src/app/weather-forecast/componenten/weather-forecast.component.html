@@ -1,1 +1,4 @@
-<app-weather-forecast-list [weatherForecast]="weatherForecast | async"></app-weather-forecast-list>
+<app-weather-forecast-list
+  [progressMessage]="progressMessage | async"
+  [weatherForecast]="weatherForecast | async">
+</app-weather-forecast-list>
