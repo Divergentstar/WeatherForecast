@@ -48,14 +48,11 @@ export class SignalRService {
     });
   }
 
-  public registerListener<T>(methodName: string): Observable<T> {
+  public registerListener<T>(methodName: string, data$: Subject<T>): void {
     console.log(`registering listener on method ${methodName}`);
-    const data$ = new Subject<T>();
     this.hubConnection?.on(methodName, (data: T) => {
       data$.next(data);
     });
-
-    return data$;
   }
 
   public stopConnection(): void {

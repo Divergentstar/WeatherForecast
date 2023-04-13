@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { share, tap } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { map, share, tap } from 'rxjs/operators';
 import { ApiService } from '../../../shared/services/api.service';
 import { BaseService } from '../../../shared/services/base.service';
+import { WeatherForecastModel } from '../models/weather-forecast-model';
+import { ListResultModel } from '../../../shared/models/list-result-model';
 import { ApiDataResponseModel } from '../../../shared/models/api-data-response-model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WeatherForecastService extends BaseService {
+  weatherForecast$ = new Subject<ListResultModel<WeatherForecastModel>>();
+
   constructor(private apiService: ApiService) {
     super();
   }
@@ -26,5 +30,10 @@ export class WeatherForecastService extends BaseService {
         }),
         share()
       );
+  }
+
+  public getWeatherForecast(): Observable<WeatherForecastModel[]> {
+    return this.weatherForecast$
+      .pipe(map((weatherForecast) => weatherForecast.data.map((m) => new WeatherForecastModel(m))));
   }
 }

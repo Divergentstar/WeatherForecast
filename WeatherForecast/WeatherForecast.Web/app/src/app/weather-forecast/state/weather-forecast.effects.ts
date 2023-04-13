@@ -5,8 +5,6 @@ import { map, switchMap } from 'rxjs/operators';
 import { WeatherForecastActionTypes, SetWeatherForecast } from './weather-forecast.actions';
 import { WeatherForecastState } from './weather-forecast.reducer';
 import { SignalRService } from '../../shared/services/signalr.service';
-import { ListResultModel } from '../../shared/models/list-result-model';
-import { WeatherForecastModel } from '../shared/models/weather-forecast-model';
 import { WeatherForecastService } from '../shared/services/weather-forecast.service';
 
 @Injectable()
@@ -31,10 +29,9 @@ export class WeatherForecastEffects {
       switchMap((result) => {
         if (result && result.success) {
           this.signalRService.registerProgressListener();
-          const weatherForecast$ = this.signalRService.registerListener<ListResultModel<WeatherForecastModel>>(result.result)
-            .pipe(map((weatherForecast) => weatherForecast.data.map((m) => new WeatherForecastModel(m))));
+          this.signalRService.registerListener(result.result, this.service.weatherForecast$);
 
-          return weatherForecast$
+          return this.service.getWeatherForecast()
             .pipe(map((weatherForecast) => {
               console.log('stop weather forecast');
               this.signalRService.stopConnection();
