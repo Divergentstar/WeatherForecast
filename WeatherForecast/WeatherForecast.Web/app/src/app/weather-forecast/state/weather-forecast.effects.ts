@@ -1,38 +1,20 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { WeatherForecastActionTypes, SetWeatherForecast, LoadWeatherForecast } from './weather-forecast.actions';
 import { WeatherForecastState } from './weather-forecast.reducer';
 import { SignalRService } from '../../shared/services/signalr.service';
-import { ApplicatieState } from '../../shared/state/applicatie.reducer';
-import { UpdateProgressMessage } from '../../shared/state/applicatie.actions';
 import { WeatherForecastService } from '../shared/services/weather-forecast.service';
 
 @Injectable()
-export class WeatherForecastEffects implements OnDestroy {
-  private progressMessageSub: Subscription | null;
-
+export class WeatherForecastEffects {
   constructor(
     private actions: Actions,
     private signalRService: SignalRService,
     private service: WeatherForecastService,
-    private store: Store<WeatherForecastState>,
-    private applicatieStore: Store<ApplicatieState>
-  ) {
-    this.progressMessageSub = this.signalRService.progressMessage$
-      .subscribe((progressMessage) => {
-        this.applicatieStore.dispatch(new UpdateProgressMessage(progressMessage));
-      });
-  }
-
-  ngOnDestroy(): void {
-    if (this.progressMessageSub) {
-      this.progressMessageSub.unsubscribe();
-      this.progressMessageSub = null;
-    }
-  }
+    private store: Store<WeatherForecastState>
+  ) {}
 
   startWeatherForecast = createEffect(() =>
     this.actions.pipe(

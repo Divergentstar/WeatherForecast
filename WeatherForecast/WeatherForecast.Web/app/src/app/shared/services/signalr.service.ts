@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { MessageTypeEnum } from '../models/enums';
 import { environment } from '../../../environments/environment';
+import { ApplicatieStoreService } from './applicatie-store.service';
 import { ProgressMessageModel } from '../models/progress-message-model';
 
 @Injectable({
@@ -10,7 +11,8 @@ import { ProgressMessageModel } from '../models/progress-message-model';
 })
 export class SignalRService {
   private hubConnection!: HubConnection;
-  public progressMessage$ = new Subject<ProgressMessageModel>();
+
+  constructor(private applicatieStore: ApplicatieStoreService) {}
 
   public initialiseConnection(path: string): void {
     this.buildConnection(path);
@@ -21,7 +23,7 @@ export class SignalRService {
     const methodName = 'SendProgressMessage';
     console.log(`registering listener on method ${methodName}`);
     this.hubConnection?.on(methodName, (progressMessage: ProgressMessageModel) => {
-      this.progressMessage$.next(progressMessage);
+      this.applicatieStore.updateProgressMessage(progressMessage);
 
       if (progressMessage.messageType !== MessageTypeEnum.Progress) {
         this.stopConnection();
