@@ -84,6 +84,7 @@ namespace WeatherForecast.Application.WeatherForecast.Services
             while (index < days)
             {
                 index++;
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 weatherForecast.Data.Add(new WeatherForecastDto
                 {
                     Date = DateTime.Today.AddDays(index),
@@ -99,7 +100,6 @@ namespace WeatherForecast.Application.WeatherForecast.Services
                         MessageType = MessageType.Progress
                     }
                 });
-                Thread.Sleep(TimeSpan.FromSeconds(10));
             }
 
             return weatherForecast;
