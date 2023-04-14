@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { WeatherForecastModel } from '../models/weather-forecast-model';
-import { LoadWeatherForecast, SetWeatherForecast } from '../../state/weather-forecast.actions';
+import { StartWeatherForecast, LoadWeatherForecast, SetWeatherForecast } from '../../state/weather-forecast.actions';
 import { WeatherForecastState } from '../../state/weather-forecast.reducer';
 import { weatherForecastQuery } from '../../state/weather-forecast.selectors';
 
@@ -13,6 +13,9 @@ export class WeatherForecastStoreService {
 
   constructor(private store: Store<WeatherForecastState>) { }
 
+  startWeatherForecast() {
+    this.store.dispatch(new StartWeatherForecast());
+  }
   loadWeatherForecast() {
     this.store.dispatch(new LoadWeatherForecast());
   }

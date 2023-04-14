@@ -14,6 +14,6 @@ export class WeatherForecastComponent implements OnInit {
   constructor(private store: WeatherForecastStoreService, private applicatieStore: ApplicatieStoreService) { }
 
   ngOnInit(): void {
-    this.store.loadWeatherForecast();
+    this.store.startWeatherForecast();
   }
 }

@@ -4,21 +4,15 @@ import { ApplicatieAction, ApplicatieActionTypes } from './applicatie.actions';
 export const APPLICATIE_FEATURE_KEY = 'applicatieFeature';
 
 export interface ApplicatieState {
-  progressMessage: ProgressMessageModel;
+  progressMessage: ProgressMessageModel | null;
 }
 
 export interface ApplicatiePartialState {
   readonly [APPLICATIE_FEATURE_KEY]: ApplicatieState;
 }
 
-const progressMessageModelInitialState: ProgressMessageModel = {
-  context: '',
-  message: '',
-  messageType: null
-};
-
 export const applicatieInitialState: ApplicatieState = {
-  progressMessage: {...progressMessageModelInitialState}
+  progressMessage: null
 };
 
 export function applicatieReducer(
@@ -34,5 +28,5 @@ export function applicatieReducer(
       break;
     }
   }
-  return state;
+  return state as ApplicatieState;
 }

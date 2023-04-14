@@ -1,21 +1,43 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
+import { MessageTypeEnum } from '../models/enums';
 import { environment } from '../../../environments/environment';
-import { ApplicatieStoreService } from './applicatie-store.service';
 import { ProgressMessageModel } from '../models/progress-message-model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
-  private hubConnection?: HubConnection;
+  private hubConnection!: HubConnection;
+  public progressMessage$ = new Subject<ProgressMessageModel>();
 
-  constructor(
-    private applicatieStore: ApplicatieStoreService
-  ) { }
+  public initialiseConnection(path: string): void {
+    this.buildConnection(path);
+    this.startConnection();
+  }
 
-  public buildConnection(path: string): void {
+  public registerProgressListener(): void {
+    const methodName = 'SendProgressMessage';
+    console.log(`registering listener on method ${methodName}`);
+    this.hubConnection?.on(methodName, (progressMessage: ProgressMessageModel) => {
+      this.progressMessage$.next(progressMessage);
+
+      if (progressMessage.messageType !== MessageTypeEnum.Progress) {
+        this.stopConnection();
+      }
+    });
+  }
+
+  public registerDataListener<T>(methodName: string, data$: Subject<T>): void {
+    console.log(`registering listener on method ${methodName}`);
+    this.hubConnection.on(methodName, (data: T) => {
+      data$.next(data);
+      this.stopConnection();
+    });
+  }
+
+  private buildConnection(path: string): void {
     console.log('building connection');
     this.hubConnection = new HubConnectionBuilder()
       //.configureLogging()
@@ -24,14 +46,14 @@ export class SignalRService {
       .build();
   }
 
-  public startConnection(): void {
+  private startConnection(): void {
     console.log('starting connection');
 
-    if (this.hubConnection?.state === HubConnectionState.Connected) {
+    if (this.hubConnection.state === HubConnectionState.Connected) {
       return;
     }
 
-    this.hubConnection?.start().then(
+    this.hubConnection.start().then(
       () => {
         console.log('Hub connection started.');
       },
@@ -39,30 +61,14 @@ export class SignalRService {
     );
   }
 
-
-  public registerProgressListener(): void {
-    const methodName = 'SendProgressMessage';
-    console.log(`registering listener on method ${methodName}`);
-    this.hubConnection?.on(methodName, (data: ProgressMessageModel) => {
-      this.applicatieStore.updateProgressMessage(data);
-    });
-  }
-
-  public registerListener<T>(methodName: string, data$: Subject<T>): void {
-    console.log(`registering listener on method ${methodName}`);
-    this.hubConnection?.on(methodName, (data: T) => {
-      data$.next(data);
-    });
-  }
-
-  public stopConnection(): void {
+  private stopConnection(): void {
     console.log('stopping connection');
 
-    if (this.hubConnection?.state === HubConnectionState.Disconnected) {
+    if (this.hubConnection.state === HubConnectionState.Disconnected) {
       return;
     }
 
-    this.hubConnection?.stop().then(
+    this.hubConnection.stop().then(
       () => {
         console.log('Hub connection stopped.');
       },
